@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Our Online Shop</title>
+    <link rel="stylesheet" href="{% static 'product/css/style.css' %}">
+</head>
+<body>
+    <div class="background">
+        <div class="content">
+            <h1>Welcome to Our Online Shop!</h1>
+            <p>Your one-stop destination for the best products and exclusive deals. Explore a wide range of categories and enjoy a seamless shopping experience. Our commitment is to provide quality products and excellent customer service. Shop now and discover the difference!</p>
+            <a href="{% url 'products' %}" class="btn">Surf Products</a>
+        </div>
+    </div>
+</body>
+</html>

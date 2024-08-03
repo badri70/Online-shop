@@ -5,7 +5,9 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm, UserLoginForm
+
 
 # Create your views here.
 class SingUpView(CreateView):
@@ -28,8 +30,14 @@ def login_user(request):
             user = authenticate(request, username=username, password=password)
             if user:
                 login(request, user=user)
-                return redirect('home')
+                return redirect('products')
     else:
         form = UserLoginForm()
     return render(request, 'user/login.html', {'form': form})
+
+@login_required
+def logout_user(request):
+    if request.method == 'POST':
+        logout(request=request)
+        return redirect(reverse_lazy('login'))
 

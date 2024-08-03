@@ -10,6 +10,13 @@
 </head>
 <body>
     <div class="container col-3 mt-5">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-success" role="alert">
+                {{message}}
+            </div>
+            {% endfor %}
+        {% endif %}
         <h2 class="text-center">Login</h2>
         <form method="post">
             {% csrf_token %}
@@ -23,9 +30,9 @@
                 {{ form.password }}
                 {{ form.password.errors }}
             </div>
-            <button type="submit" class="btn btn-primary col-12 mt-5">Login</button>
+            <button type="submit" class="btn btn-primary col-12 mt-3">Login</button>
         </form>
-        <p></p>
+        <p class="text-center"><a href="{% url 'register' %}" style="text-decoration: none;">If you don't have an account, register.</a></p>
     </div>
 </body>
 </html>
