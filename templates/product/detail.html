@@ -95,7 +95,7 @@
                             <a class="nav-link text-white" href="{% url 'products' %}">Shop</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="#">Cart</a>
+                            <a class="nav-link text-white" href="{% url 'cart_list' %}">Cart</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-white" href="#">Orders</a>
@@ -127,7 +127,7 @@
                     <h2>{{ product.name }}</h2>
                     <p>{{ product.description }}</p>
                     <h4 class="text-primary">${{ product.price }}</h4>
-                    <button class="btn btn-primary btn-lg">Add to Cart</button>
+                    <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary btn-lg">Add to Cart</a>
                 </div>
             </div>
         </div>
@@ -145,7 +145,7 @@
                     <ul class="list-unstyled">
                         <li><a href="{% url 'home' %}">Home</a></li>
                         <li><a href="{% url 'products' %}">Shop</a></li>
-                        <li><a href="#">Cart</a></li>
+                        <li><a href="{% url 'cart_list' %}">Cart</a></li>
                         <li><a href="#">Orders</a></li>
                     </ul>
                 </div>

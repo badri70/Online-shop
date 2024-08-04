@@ -22,6 +22,23 @@ class Product(models.Model):
         return self.name
 
 
+class Cart(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Cart {self.id} by {self.user.username}'
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(to=Cart, on_delete=models.CASCADE, related_name='cart_item')
+    product = models.ForeignKey(to=Product, on_delete=models.CASCADE, related_name='cart_product')
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f'Cart: {self.id}-{self.quantity}-{self.product.price}'
+
+
 # class Order(models.Model):
 #     STATUS_CHOICES = [
 #         ('processing', 'В обработке'),
@@ -47,14 +64,3 @@ class Product(models.Model):
 
 #     def __str__(self):
 #         return f'Order: {self.id}-{self.quantity}-{self.price}'
-
-
-# class Cart(models.Model):
-#     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return f'Cart {self.id} by {self.user.username}'
-
-
-    

@@ -1,39 +1,44 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product List</title>
+    <title>Cart</title>
     {% load bootstrap5 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
-    <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"> -->
     <style>
-        .category-list {
-            border-right: 1px solid #dee2e6;
-            padding-right: 15px;
+        .cart-header {
+            background-color: #343a40;
+            color: white;
+            padding: 15px;
         }
-        .category-list a {
-            text-decoration: none;
-            color: #007bff;
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #dee2e6;
         }
-        .category-list a:hover {
-            text-decoration: underline;
-        }
-        .product-card {
-            transition: transform 0.3s, box-shadow 0.3s;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-        }
-        .card-img-top {
-            height: 200px;
+        .cart-item img {
+            width: 80px;
+            height: 80px;
             object-fit: cover;
-            border-radius: 10px 10px 0 0;
+            margin-right: 15px;
+        }
+        .cart-item-details {
+            flex: 1;
+        }
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+        }
+        .cart-item-quantity input {
+            width: 50px;
+            margin: 0 10px;
+        }
+        .cart-item-remove {
+            color: #dc3545;
+            cursor: pointer;
         }
         footer {
             background-color: #343a40;
@@ -77,43 +82,35 @@
             </div>
         </div>
     </header>
-
     <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-3 category-list">
-                <h2 class="h4">Categories</h2>
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        <a href="{% url 'products' %}">All</a>
-                    </li>
-                    {% for category in categories %}
-                        <li class="list-group-item">
-                            <a href="{% url 'products_category' category.id %}">{{ category.name }}</a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            
-            <div class="col-md-9">
-                <div class="row">
-                    {% for product in object_list %}
-                    <div class="col-md-4 mb-4">
-                        <div class="card product-card">
-                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ product.name }}</h5>
-                                <p class="card-text">${{ product.price }}</p>
-                                <a href="{% url 'product' product.pk %}" class="btn btn-primary">View Details</a>
-                                <a href="{% url 'add_to_cart' product.pk %}" class="btn btn-success">Add to Cart</a>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
+        <div class="cart-header">
+            <h2>Shopping Cart</h2>
+        </div>
+        <div class="cart-items mt-4">
+            {% for item in cart.cart_item.all %}
+            <div class="cart-item">
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                <div class="cart-item-details">
+                    <h5>{{ item.product.name }}</h5>
+                    <p>${{ item.product.price }}</p>
+                </div>
+                <div class="cart-item-quantity">
+                    <span>Quantity: </span>
+                    <span>{{ item.quantity }}</span>
+                </div>
+                <div class="cart-item-remove">
+                    <i class="fas fa-trash-alt"></i>
                 </div>
             </div>
+            {% empty %}
+            <p>Your cart is empty.</p>
+            {% endfor %}
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <a href="{% url 'products' %}" class="btn btn-secondary">Continue Shopping</a>
+            <a href="#" class="btn btn-primary">Proceed to Checkout</a>
         </div>
     </div>
-
     <footer class="mt-5">
         <div class="container">
             <div class="row">
