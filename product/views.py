@@ -1,9 +1,19 @@
 from typing import Any
+import logging
+import stripe
 from django.db.models.query import QuerySet
+from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, ListView, DetailView, View
 from .models import Category, Product, Cart, CartItem
+
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+logger = logging.getLogger(__name__)
 
 
 # Create your views here.
@@ -62,3 +72,76 @@ class CartListView(LoginRequiredMixin, ListView):
         cart, created = Cart.objects.get_or_create(user=self.request.user)
         context['cart'] = Cart.objects.get(user=self.request.user)
         return context
+
+
+class CreateStripeCheckoutSessionView(View):
+    def post(self, request, *args, **kwargs):
+        cart = get_object_or_404(Cart, user=request.user)
+        line_items = []
+
+        for cart_item in cart.cart_item.all():
+            line_items.append({
+                "price_data": {
+                    "currency": "eur",
+                    "unit_amount": int(cart_item.product.price * 100),
+                    "product_data": {
+                        "name": cart_item.product.name,
+                        "description": cart_item.product.description,
+                        "images": [
+                            f"{settings.BACKEND_DOMAIN}{cart_item.product.image.url}"
+                        ],
+                    },
+                },
+                "quantity": cart_item.quantity
+            })
+        
+        logger.info(f"Line items: {line_items}")
+
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=["card", "bancontact", "eps", "giropay", "ideal"],
+            line_items=line_items,
+            metadata={"cart_id": cart.id},
+            mode="payment",
+            success_url=settings.PAYMENT_SUCCESS_URL,
+            cancel_url=settings.PAYMENT_CANCEL_URL,
+        )
+
+        logger.info(f"Checkout session created: {checkout_session}")
+
+        return redirect(checkout_session.url)
+
+
+class SuccessView(TemplateView):
+    template_name = "product/success.html"
+
+
+class CancelView(TemplateView):
+    template_name = "product/cancel.html"
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class StripeWebhookView(View):
+    def post(self, request, format=None):
+        payload = request.body
+        endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
+        sig_header = request.META["HTTP_STRIPE_SIGNATURE"]
+        event = None
+
+        try:
+            event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
+            logger.info(f"Webhook event received: {event['type']}")
+        except ValueError as e:
+            logger.error(f"Invalid payload: {e}")
+            return HttpResponse(status=400)
+        except stripe.error.SignatureVerificationError as e:
+            logger.error(f"Invalid signature: {e}")
+            return HttpResponse(status=400)
+
+        if event["type"] == "checkout.session.completed":
+            logger.info("Payment successful")
+            session = event['data']['object']
+            logger.info(f"Session: {session}")
+
+        return HttpResponse(status=200)
+    
+

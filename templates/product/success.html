@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful</title>
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+            text-align: center;
+        }
+        .success-icon {
+            font-size: 100px;
+            color: #28a745;
+        }
+        .message {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+        .btn-home {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="message">
+            <h1>Payment Successful!</h1>
+            <p>Thank you for your purchase.</p>
+        </div>
+        <a href="{% url 'home' %}" class="btn btn-primary btn-home">Go to Home</a>
+    </div>
+</body>
+</html>

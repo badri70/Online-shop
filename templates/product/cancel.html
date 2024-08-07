@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Cancelled</title>
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+            text-align: center;
+        }
+        .cancel-icon {
+            font-size: 100px;
+            color: #dc3545;
+        }
+        .message {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+        .btn-home {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="cancel-icon">
+            <i class="fas fa-times-circle"></i>
+        </div>
+        <div class="message">
+            <h1>Payment Cancelled</h1>
+            <p>Your payment was not completed.</p>
+        </div>
+        <a href="{% url 'home' %}" class="btn btn-primary btn-home">Go to Home</a>
+    </div>
+</body>
+</html>

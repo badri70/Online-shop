@@ -126,7 +126,7 @@
                 <div class="product-details">
                     <h2>{{ product.name }}</h2>
                     <p>{{ product.description }}</p>
-                    <h4 class="text-primary">${{ product.price }}</h4>
+                    <h4 class="text-primary">€{{ product.price }}</h4>
                     <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary btn-lg">Add to Cart</a>
                 </div>
             </div>
