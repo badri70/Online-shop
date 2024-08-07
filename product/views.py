@@ -98,7 +98,7 @@ class CreateStripeCheckoutSessionView(View):
         logger.info(f"Line items: {line_items}")
 
         checkout_session = stripe.checkout.Session.create(
-            payment_method_types=["card", "bancontact", "eps", "giropay", "ideal"],
+            payment_method_types=["card"],
             line_items=line_items,
             metadata={"cart_id": cart.id},
             mode="payment",
@@ -127,6 +127,8 @@ class StripeWebhookView(View):
         sig_header = request.META["HTTP_STRIPE_SIGNATURE"]
         event = None
 
+        logger.info(f"Received webhook: {payload}")
+
         try:
             event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
             logger.info(f"Webhook event received: {event['type']}")
@@ -138,9 +140,8 @@ class StripeWebhookView(View):
             return HttpResponse(status=400)
 
         if event["type"] == "checkout.session.completed":
-            logger.info("Payment successful")
-            session = event['data']['object']
-            logger.info(f"Session: {session}")
+            pass
+            
 
         return HttpResponse(status=200)
     
