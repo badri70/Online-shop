@@ -1,7 +1,8 @@
 from typing import Any
-import logging
 import stripe
 from django.db.models.query import QuerySet
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -9,11 +10,10 @@ from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, ListView, DetailView, View
-from .models import Category, Product, Cart, CartItem
+from .models import Category, Product, Cart, CartItem, Order, OrderItem, Payment
 
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
-logger = logging.getLogger(__name__)
 
 
 # Create your views here.
@@ -74,6 +74,15 @@ class CartListView(LoginRequiredMixin, ListView):
         return context
 
 
+class OrderListView(LoginRequiredMixin, ListView):
+    model = Order
+    template_name = 'product/order.html'
+    context_object_name = 'orders'
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+
+
 class CreateStripeCheckoutSessionView(View):
     def post(self, request, *args, **kwargs):
         cart = get_object_or_404(Cart, user=request.user)
@@ -95,18 +104,16 @@ class CreateStripeCheckoutSessionView(View):
                 "quantity": cart_item.quantity
             })
         
-        logger.info(f"Line items: {line_items}")
 
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=["card"],
             line_items=line_items,
-            metadata={"cart_id": cart.id},
+            metadata={"cart_id": cart.id, "user_id": request.user.id},
             mode="payment",
             success_url=settings.PAYMENT_SUCCESS_URL,
             cancel_url=settings.PAYMENT_CANCEL_URL,
         )
 
-        logger.info(f"Checkout session created: {checkout_session}")
 
         return redirect(checkout_session.url)
 
@@ -127,21 +134,46 @@ class StripeWebhookView(View):
         sig_header = request.META["HTTP_STRIPE_SIGNATURE"]
         event = None
 
-        logger.info(f"Received webhook: {payload}")
 
         try:
             event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
-            logger.info(f"Webhook event received: {event['type']}")
         except ValueError as e:
-            logger.error(f"Invalid payload: {e}")
             return HttpResponse(status=400)
         except stripe.error.SignatureVerificationError as e:
-            logger.error(f"Invalid signature: {e}")
             return HttpResponse(status=400)
 
         if event["type"] == "checkout.session.completed":
-            pass
+            session = event["data"]["object"]
+            user = User.objects.get(id=session["metadata"]["user_id"])
+            amount = session["amount_total"]/100
+            customer_email = session["customer_details"]["email"]
             
+            order = Order.objects.create(user=user, total_price=amount)
+            cart = Cart.objects.get(id=session["metadata"]["cart_id"])
+
+            for cart_item in cart.cart_item.all():
+                OrderItem.objects.create(
+                    product = cart_item.product,
+                    quantity = cart_item.quantity,
+                    price = cart_item.product.price,
+                    order = order
+                )
+            
+            cart.delete()
+
+            send_mail(
+                subject="Here is your product",
+                message=f"Thanks for your purchase. The URL is: http://localhost:8000/products/",
+                recipient_list=[customer_email],
+                from_email="test@gmail.com",
+                fail_silently=False,
+            )
+
+            Payment.objects.create(
+                email = customer_email,
+                order = order,
+                amount = amount
+            )
 
         return HttpResponse(status=200)
     

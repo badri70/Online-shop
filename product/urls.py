@@ -8,7 +8,8 @@ from .views import (
     AddToCartView, 
     CreateStripeCheckoutSessionView, 
     SuccessView,
-    StripeWebhookView
+    StripeWebhookView,
+    OrderListView
 )
 
 urlpatterns = [
@@ -17,6 +18,7 @@ urlpatterns = [
     path('products/category/<int:category_id>/', ProductListView.as_view(), name='products_category'),
     path('products/<int:pk>/', ProductDetailView.as_view(), name='product'),
     path('cart/', CartListView.as_view(), name='cart_list'),
+    path('orders/', OrderListView.as_view(), name='order_list'),
     path('add_to_cart/<int:product_id>/', AddToCartView.as_view(), name='add_to_cart'),
     path(
         "create-checkout-session/<int:pk>/",

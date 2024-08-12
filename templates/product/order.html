@@ -83,56 +83,33 @@
         </div>
     </header>
     <div class="container mt-5">
-        <div class="cart-header">
-            <h2>Shopping Cart</h2>
-        </div>
-        <div class="cart-items mt-4">
-            {% for item in cart.cart_item.all %}
-            <div class="cart-item">
-                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
-                <div class="cart-item-details">
-                    <h5>{{ item.product.name }}</h5>
-                    <p>€{{ item.product.price }}</p>
-                </div>
-                <div class="cart-item-quantity">
-                    <span>Quantity: </span>
-                    <span>{{ item.quantity }}</span>
-                </div>
-                <div class="cart-item-remove">
-                    <i class="fas fa-trash-alt"></i>
-                </div>
+        <h2 class="mb-4">Мои заказы</h2>
+        {% if orders %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Номер заказа</th>
+                            <th>Дата заказа</th>
+                            <th>Общая стоимость</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                            <tr>
+                                <td>{{ order.id }}</td>
+                                <td>{{ order.created_at|date:"d M Y" }}</td>
+                                <td>{{ order.total_price }} {{ order.currency }}</td>
+                                <td>{{ order.status }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            {% empty %}
-            <p>Your cart is empty.</p>
-            {% endfor %}
-        </div>
-        <div class="d-flex justify-content-between align-items-center mt-4">
-            <a href="{% url 'products' %}" class="btn btn-secondary">Continue Shopping</a>
-            <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                  Dropdown button
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                    <li>
-                        <form
-                            action="{% url 'create-checkout-session' cart.id %}"
-                            method="POST" class="dropdown-item"
-                        >
-                            {% csrf_token %}
-                            <button type="submit" class="btn">Checkout</button>
-                        </form>
-                    </li>
-                    <li>
-                        <form
-                            method="POST" class="dropdown-item"
-                        >
-                            {% csrf_token %}
-                            <button type="submit" class="btn">Cash</button>
-                        </form>
-                    </li>
-                </ul>            
-            </div>
-        </div>
+        {% else %}
+            <p>У вас нет заказов.</p>
+        {% endif %}
     </div>
     <footer class="mt-5">
         <div class="container">
