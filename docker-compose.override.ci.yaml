@@ -1,0 +1,4 @@
+services:
+  django:
+    command: tail -f /dev/null  # держим контейнер живым для exec команд
+    ports: []                   # порты не нужны в CI
