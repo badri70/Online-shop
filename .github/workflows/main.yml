@@ -63,8 +63,11 @@ jobs:
           echo "PAYMENT_SUCCESS_URL=http://localhost/success" >> .env
           echo "PAYMENT_CANCEL_URL=http://localhost/cancel" >> .env
 
+      - name: Ensure clean environment
+        run: docker compose down -v || true
+        
       - name: Start services
-        run: docker compose up -d --build
+        run: docker compose up -d --build --renew-anon-volumes
 
       - name: Wait for database
         run: docker compose exec -T django ./wait_for_db.sh db 5432
