@@ -58,7 +58,8 @@ jobs:
           echo "POSTGRES_HOST=db" >> .env
           echo "POSTGRES_PORT=5432" >> .env
           echo "STRIPE_SECRET_KEY=sk_test_51Pk1KLFaoZqYAsLBOlUCjK6QGCUQFjjbBqj2PMWTaX4wj9cqWeHAtT8x85BdjhoYeAc3mPE73AH8Okhfe5yU5fzm00lUMqXcAr" >> .env
-          echo "BACKEND_DOMAIN=http://localhost" >> .env          
+          echo "BACKEND_DOMAIN=http://localhost" >> .env
+          echo "PAYMENT_SUCCESS_URL=http://localhost/success" >> .env
 
       - name: Start services
         run: docker compose up -d --build
