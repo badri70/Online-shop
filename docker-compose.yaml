@@ -1,14 +1,9 @@
-version: '3.10'
-
 services:
   django:
     build: .
     container_name: django
-    command: ./wait_for_db.sh
-    ports:
-      - "8000:8000"
     volumes:
-      - ".:/app"
+      - .:/app
     env_file:
       - .env
     depends_on:
@@ -18,19 +13,12 @@ services:
     container_name: db
     image: postgres:15
     restart: unless-stopped
-    shm_size: 128mb
     env_file:
       - .env
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-
-  adminer:
-    image: adminer
-    restart: unless-stopped
-    ports:
-      - "8081:8080"
 
 volumes:
   postgres_data:
