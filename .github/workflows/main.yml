@@ -76,7 +76,7 @@ jobs:
         run: docker compose exec -T django python manage.py migrate
 
       - name: Run tests
-        run: docker compose exec -T django pytest -v
+        run: docker compose exec -T django python manage.py test
 
       - name: Stop services
         if: always()
