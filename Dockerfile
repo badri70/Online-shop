@@ -13,4 +13,6 @@ RUN apt-get update && apt-get install -y \
 
 COPY . .
 
+RUN chmod +x /app/wait_for_db.sh
+
 CMD ["./wait_for_db.sh"]
