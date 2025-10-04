@@ -44,16 +44,24 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: myapp-image
-
+  
       - name: Load Docker image
         run: gunzip -c myapp.tar.gz | docker load
-
-      - name: Set up Docker Compose
+  
+      - name: Create .env file
+        run: |
+          echo "DB_USER=postgres" >> .env
+          echo "DB_PASSWORD=postgres" >> .env
+          echo "DB_NAME=test_db" >> .env
+          echo "DB_HOST=db" >> .env
+          echo "DB_PORT=5432" >> .env
+  
+      - name: Run containers
         run: docker compose up -d --build
-
+  
       - name: Run tests
-        run: docker compose exec -T manage.py test  # или manage.py test для Django
-
-      - name: Tear down
+        run: docker compose exec -T django python manage.py test
+  
+      - name: Stop containers
         if: always()
         run: docker compose down -v
