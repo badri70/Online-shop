@@ -3,6 +3,7 @@ from product.models import Category, Product
 from decimal import Decimal
 from django.test import Client
 from django.urls import reverse
+from django.contrib.auth.models import User 
 
 
 class CategoryModelTest(TestCase):
@@ -56,6 +57,9 @@ class ProductViewTest(TestCase):
 
     def setUp(self):
         self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='password123') 
+        self.client.login(username='testuser', password='password123') 
+        
         self.category_a = Category.objects.create(name="A")
         self.category_b = Category.objects.create(name="B")
         
