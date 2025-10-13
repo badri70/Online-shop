@@ -1,5 +1,3 @@
-# products/tests.py
-
 from django.test import TestCase
 from product.models import Category, Product
 from decimal import Decimal
@@ -52,12 +50,7 @@ class ProductModelTest(TestCase):
         self.product.stock = 0
         self.product.save()
         self.assertFalse(self.product.stock > 0)
-
-
-
-from django.urls import reverse
-from django.test import TestCase, Client
-from products.models import Category, Product 
+        
 
 class ProductViewTest(TestCase):
 
