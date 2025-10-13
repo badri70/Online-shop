@@ -1,7 +1,7 @@
 # products/tests.py
 
 from django.test import TestCase
-from products.models import Category, Product
+from product.models import Category, Product
 from decimal import Decimal
 
 class CategoryModelTest(TestCase):
