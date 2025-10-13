@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.test import Client
 from django.urls import reverse
 from django.contrib.auth.models import User 
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 class CategoryModelTest(TestCase):
@@ -56,6 +57,12 @@ class ProductModelTest(TestCase):
 class ProductViewTest(TestCase):
 
     def setUp(self):
+        self.image = SimpleUploadedFile(
+            "test_image.png", 
+            b"file_content", 
+            content_type="image/png"
+        )
+        
         self.client = Client()
         self.user = User.objects.create_user(username='testuser', password='password123') 
         self.client.login(username='testuser', password='password123') 
@@ -68,14 +75,16 @@ class ProductViewTest(TestCase):
             description="Детали 1",
             price=10.00,
             stock=10,
-            category=self.category_a
+            category=self.category_a,
+            image=self.image
         )
         self.product_2 = Product.objects.create(
             name="Товар 2",
             description="Детали 2",
             price=20.00,
             stock=5,
-            category=self.category_b
+            category=self.category_b,
+            image=SimpleUploadedFile("test_image_2.png", b"file_content_2", content_type="image/png")
         )
         
         self.list_url = reverse('products') 
